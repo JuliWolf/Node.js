@@ -1,5 +1,6 @@
 const http = require('http');
-const fs = require('fs');
+
+const routes = require('./routes');
 
 // function rqListener(req, res){
 //
@@ -21,34 +22,7 @@ const fs = require('fs');
 
 
 // Send data and save data from input to the file
-const server = http.createServer((req, res) => {
-    const url = req.url;
-    const method = req.method;
-    if(url === '/'){
-        res.write('<html>');
-        res.write('<header><title>Enter Message</title></header>');
-        res.write('<body><form action="/message" method="POST"><input type="text" name="message"> <button type="submit">Send</button></form></body>');
-        res.write('</html>');
-        return res.end();
-    }else if(url === '/message' && method === 'POST'){
-        const body = [];
-        req.on('data', (chunk) => {
-            body.push(chunk);
-        });
-
-        req.on('end', () => {
-            const parsedBody = Buffer.concat(body).toString();
-            const message = parsedBody.split("=")[1];
-            fs.writeFileSync('message.txt', message);
-        });
-
-
-        res.writeHead(302, {
-            'Location': '/'
-        });
-        return res.end();
-    }
-});
+const server = http.createServer(routes.handler);
 
 
 server.listen(3000);
