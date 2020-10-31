@@ -1,0 +1,15 @@
+{
+  "name": "1.-basics",
+  "version": "1.0.0",
+  "description": "Complete Node.js Guide",
+  "main": "routes.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Juli Wolf",
+  "license": "ISC"
+}
