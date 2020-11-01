@@ -1,4 +1,4 @@
-const http = require('http');
+// const http = require('http');
 
 const express = require('express');
 
@@ -9,11 +9,9 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use((req, res, next) => {
-    console.log('In another middleware!');
+// const server = http.createServer(app);
+// server.listen(3000);
 
-});
+// Alternative
+app.listen(3000);
 
-const server = http.createServer(app);
-
-server.listen(3000);
