@@ -13,10 +13,10 @@ router.get('/', (req, res, next) => {
 
 router.post('/add-user', (req, res, next) => {
     users.push({userName: req.body.userName});
-    res.redirect('/user');
+    res.redirect('/users');
 });
 
-router.get('/user', (req, res, next) => {
+router.get('/users', (req, res, next) => {
     res.render('users', {
         pageTitle: 'Add User',
         pathName: '/user',
