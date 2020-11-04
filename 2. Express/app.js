@@ -10,7 +10,7 @@ const expressHbs = require('express-handlebars');
 const app = express();
 
 //register handlebar
-app.engine('hbs', expressHbs({extname: '.hbs', defaultLayout: false}));
+app.engine('hbs', expressHbs({layoutsDir: 'views/layouts/', defaultLayout: 'main-layout', extname: 'hbs'}));
 app.set('view engine', 'hbs');
 
 // set template engine and template dir
