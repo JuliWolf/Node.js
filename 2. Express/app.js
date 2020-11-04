@@ -10,7 +10,7 @@ const path = require('path');
 const app = express();
 
 //register handlebar
-// app.engine('hbs', expressHbs({layoutsDir: 'views/layouts/', defaultLayout: 'main-layout', extname: 'hbs'}));
+// app.engine('hbs', expressHbs({layoutsDir: 'views/layouts/', defaultLayout: 'main-layouts', extname: 'hbs'}));
 // app.set('view engine', 'hbs');
 
 // set template engine and template dir
@@ -38,5 +38,5 @@ app.use('/', (req, res, next) => {
 // server.listen(3000);
 
 // Alternative
-app.listen(3000);
+app.listen(3001);
 
