@@ -6,6 +6,10 @@ const path = require('path');
 
 const app = express();
 
+// set template engine and template dir
+app.set('view engine', 'pug');
+app.set('views', 'views');
+
 const adminData = require('./routes/admin');
 const shopRouter = require('./routes/shop');
 
