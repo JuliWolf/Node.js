@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 
 const errorController = require('./controllers/error');
 const sequelize = require('./util/database');
+const Product = require('./models/product');
+const User = require('./models/user');
 
 const app = express();
 
@@ -22,10 +24,34 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-sequelize.sync().then(result => {
-    // console.log(result);
-    app.listen(3000);
-}).catch(err => {
-    console.log(err);
+// Make relations
+Product.belongsTo(User, {
+    constraints: true,
+    onDelete: 'CASCADE'
 });
+
+User.hasMany(Product);
+
+
+sequelize
+    // .sync({force: true})
+    .sync()
+    .then(result => {
+        return User.findByPk(1);
+        // console.log(result);
+
+    })
+    .then(user => {
+        if(!user){
+            return User.create({name: 'Julia', email: 'test@test.ru'});
+        }
+        return Promise.resolve(user);
+    })
+    .then(user => {
+        console.log(user);
+        app.listen(3000);
+    })
+    .catch(err => {
+        console.log(err);
+    });
 
