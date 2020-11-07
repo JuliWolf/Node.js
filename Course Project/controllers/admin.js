@@ -34,18 +34,20 @@ exports.getEditProduct = (req, res, next) => {
         return res.redirect('/');
     }
     const prodId = req.params.productId;
-    Product.findById(prodId, product => {
-        if(!product){
-            return res.redirect('/');
-        }
-        res.render('admin/edit-product', {
-            pageTitle: 'Edit Product',
-            path: '/admin/edit-product',
-            editing: editMode,
-            product: product
+    Product.findById(prodId)
+        .then((row, fieldData) => {
+            if(!row[0]){
+                return res.redirect('/');
+            }
+            res.render('admin/edit-product', {
+                pageTitle: 'Edit Product',
+                path: '/admin/edit-product',
+                editing: editMode,
+                product: row[0]
+            });
+        }).catch(err => {
+            console.log(err);
         });
-    });
-
 };
 
 exports.postEditProduct = (req, res, next) => {
