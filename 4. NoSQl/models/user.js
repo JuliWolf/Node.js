@@ -47,25 +47,25 @@ class User {
   }
 
   getCart(){
-    const db = getDB();
-    if(!this.cart){
-      return Promise.resolve([]);
-    }
-    const productIds = this.cart.items.map(item => item.productId);
-    return db
-      .collection('products')
-      .find({_id: {$in: productIds}})
-      .toArray()
-      .then(products => {
-        return products.map(p => {
-          return {
-            ...p,
-            quantity: this.cart.items.find(i =>
-                i.productId.toString() === p._id.toString()).quantity
-          }
-        });
-      })
-      .catch(err => console.log(err));
+      const db = getDB();
+      if(!this.cart){
+          return Promise.resolve([]);
+      }
+      const productIds = this.cart.items.map(item => item.productId);
+      return db
+          .collection('products')
+          .find({_id: {$in: productIds}})
+          .toArray()
+          .then(products => {
+              return products.map(p => {
+                  return {
+                      ...p,
+                      quantity: this.cart.items.find(i =>
+                          i.productId.toString() === p._id.toString()).quantity
+                  }
+            });
+        })
+        .catch(err => console.log(err));
   }
 
   deleteItemFromCart(prodId){
@@ -75,21 +75,55 @@ class User {
     return db
         .collection('users')
         .updateOne(
-        {_id: new ObjectId(this._id)},
-        {$set: {cart: {items: updatedCartItems} }})
+            {_id: new ObjectId(this._id)},
+            {$set: {cart: {items: updatedCartItems} }})
+  }
+
+  addOrder(){
+      const db = getDB();
+      return this.getCart()
+          .then(products => {
+              const order = {
+                  items: products,
+                  user: {
+                    _id: new ObjectId(this._id),
+                    name: this.name,
+                    email: this.email
+                  }
+              };
+              return db
+                  .collection('orders')
+                  .insertOne(order)
+          })
+          .then(result => {
+              this.cart = {items: []};
+              return db
+                  .collection('users')
+                  .updateOne(
+                      {_id: new ObjectId(this._id)},
+                      {$set: {cart: {items: [] } }})
+          })
+          .catch(err => console.log(err));
+  }
+
+  getOrders(){
+      const db = getDB();
+      return db.collection('orders')
+          .find({'user._id': new ObjectId(this._id)})
+          .toArray();
   }
 
   static findById(userId){
-    const db = getDB();
-    return db.collection('users')
-      .findOne({_id: new ObjectId(userId)})
-      .then(user => {
-        console.log(user);
-        return user;
-      })
-      .catch(err => {
-        console.log(err);
-      });
+      const db = getDB();
+      return db.collection('users')
+          .findOne({_id: new ObjectId(userId)})
+          .then(user => {
+              console.log(user);
+              return user;
+          })
+          .catch(err => {
+              console.log(err);
+          });
   }
 }
 
