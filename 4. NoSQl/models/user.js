@@ -35,11 +35,31 @@ class User {
     };
     const db = getDB();
     return db
-        .collection('users')
-        .updateOne(
-          {_id: new ObjectId(this._id)},
-          {$set: {cart: updatedCart} }
-        )
+      .collection('users')
+      .updateOne(
+        {_id: new ObjectId(this._id)},
+        {$set: {cart: updatedCart} }
+      )
+  }
+
+  getCart(){
+    const db = getDB();
+    console.log(this.cart.items)
+    const productIds = this.cart.items.map(item => item.productId);
+    return db
+      .collection('products')
+      .find({_id: {$in: productIds}})
+      .toArray()
+      .then(products => {
+        return products.map(p => {
+          return {
+            ...p,
+            quantity: this.cart.items.find(i =>
+                i.productId.toString() === p._id.toString()).quantity
+          }
+        });
+      })
+      .catch(err => console.log(err));
   }
 
   static findById(userId){
