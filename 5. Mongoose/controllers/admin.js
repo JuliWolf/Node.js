@@ -78,6 +78,10 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+      // to select data and exclude some
+      // .select('title price -_id')
+    //  to get related data
+    // .populate('userId')
     .then(products => {
       res.render('admin/products', {
         prods: products,
