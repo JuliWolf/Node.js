@@ -27,7 +27,8 @@ exports.getLogin = (req, res, next) => {
         oldInput: {
             email: "",
             password: ""
-        }
+        },
+        validationErrors: []
     });
 };
 
@@ -45,7 +46,8 @@ exports.getSignup = (req, res, next) => {
         oldInput: {
             email: "",
             password: ""
-        }
+        },
+        validationErrors: []
     });
 };
 
@@ -62,7 +64,8 @@ exports.postLogin = (req, res, next) => {
                 oldInput: {
                     email: email,
                     password: password
-                }
+                },
+                validationErrors: errors.array()
             });
     }
 
@@ -105,7 +108,8 @@ exports.postSignup = (req, res, next) => {
                 oldInput: {
                     email: email,
                     password: password
-                }
+                },
+                validationErrors: errors.array()
             });
     }
     bcrypt.hash(password, 12)
