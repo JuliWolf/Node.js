@@ -22,10 +22,12 @@ router.post('/login',
                     })
             })
             .isEmail()
-            .withMessage('Please enter a valid email'),
+            .withMessage('Please enter a valid email')
+            .normalizeEmail(),
         body('password', 'Wrong password or email.')
             .isLength({min: 5})
             .isAlphanumeric()
+            .trim()
     ],
     authController.postLogin);
 
@@ -45,10 +47,12 @@ router.post('/signup',
                     })
             })
             .isEmail()
-            .withMessage('Please enter a valid email'),
+            .withMessage('Please enter a valid email')
+            .normalizeEmail(),
         body('password', 'Please enter a password with only numbers and text at least 5 characters.')
             .isLength({min: 5})
-            .isAlphanumeric(),
+            .isAlphanumeric()
+            .trim(),
         body('confirmPassword')
             .custom((value, {req}) => {
                 console.log(value, req.body.password)
@@ -57,6 +61,7 @@ router.post('/signup',
                 }
                 return true;
             })
+            .trim()
     ],
     authController.postSignup);
 
