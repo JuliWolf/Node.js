@@ -10,7 +10,24 @@ router.get('/login', authController.getLogin);
 
 router.get('/signup' , authController.getSignup);
 
-router.post('/login', authController.postLogin);
+router.post('/login',
+    [
+        body('email')
+            .custom((value) => {
+                return User.findOne({email: value})
+                    .then(user => {
+                        if (!user) {
+                            return Promise.reject('Wrong password or email.');
+                        }
+                    })
+            })
+            .isEmail()
+            .withMessage('Please enter a valid email'),
+        body('password', 'Wrong password or email.')
+            .isLength({min: 5})
+            .isAlphanumeric()
+    ],
+    authController.postLogin);
 
 router.post('/signup',
     [
@@ -28,13 +45,13 @@ router.post('/signup',
                     })
             })
             .isEmail()
-            .withMessage('Please enter a valid email')
-        ,
-        body('password', 'Please enter a password wuth only numbers and text at least 5 characters.')
+            .withMessage('Please enter a valid email'),
+        body('password', 'Please enter a password with only numbers and text at least 5 characters.')
             .isLength({min: 5})
             .isAlphanumeric(),
-        body('confirmedPassword')
+        body('confirmPassword')
             .custom((value, {req}) => {
+                console.log(value, req.body.password)
                 if(value !== req.body.password){
                     throw new Error('Password have to match!');
                 }
