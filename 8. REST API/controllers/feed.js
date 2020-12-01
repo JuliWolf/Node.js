@@ -1,42 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-
-const {validationResult} = require('express-validator');
-
+const helpers = require('../utils/helpers');
 const Post = require('../models/post');
 
-
-const catchErrorHandler = (err) => {
-    if(!err.statusCode){
-        err.statusCode = 500;
-    }
-    next(err);
-};
-
-const checkPostHandler = (post) => {
-    if(!post){
-        const error = new Error('Could not find post');
-        error.statusCode = 404;
-        throw error;
-    }
-};
-
-const checkFileHandler = (req) => {
-    if(!req.file){
-        const error = new Error('No image provided.');
-        error.statusCode = 422;
-        throw error;
-    }
-};
-
-const checkErrorsHandler = (req) => {
-    const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        const error = new Error('Validation failed, entered data is incorrect.');
-        error.statusCode = 422;
-        throw error;
-    }
-};
 
 exports.getPosts = (req, res, next) => {
     Post.find()
@@ -46,12 +10,12 @@ exports.getPosts = (req, res, next) => {
                 posts
             });
         })
-        .catch(catchErrorHandler);
+        .catch((err) => helpers.catchErrorHandler(err, next));
 };
 
 exports.createPost = (req, res, next) => {
-    checkErrorsHandler(req);
-    checkFileHandler(req);
+    helpers.checkErrorsHandler(req);
+    helpers.checkFileHandler(req);
     const imageUrl = req.file.path;
     const title = req.body.title;
     const content = req. body.content;
@@ -71,26 +35,26 @@ exports.createPost = (req, res, next) => {
                 post: result
             });
         })
-        .catch(catchErrorHandler);
+        .catch((err) => helpers.catchErrorHandler(err, next));
 };
 
 exports.getPost = (req, res, next) => {
     const postId = req.params.postId;
     Post.findById(postId)
         .then(post => {
-            checkPostHandler(post);
+            helpers.checkPostHandler(post);
             res.status(200)
                 .json({
                     message: 'Post fetched.',
                     post
                 })
         })
-        .catch(catchErrorHandler);
+        .catch((err) => helpers.catchErrorHandler(err, next));
 };
 
 exports.updatePost = (req, res, next) => {
     const postId = req.params.postId;
-    checkErrorsHandler(req);
+    helpers.checkErrorsHandler(req);
 
     const title = req.body.title;
     const content = req.body.content;
@@ -107,9 +71,9 @@ exports.updatePost = (req, res, next) => {
 
     Post.findById(postId)
         .then(post => {
-            checkPostHandler(post);
+            helpers.checkPostHandler(post);
             if(imageUrl !== post.imageUrl){
-                clearImage(post.imageUrl);
+                helpers.clearImage(post.imageUrl);
             }
             post.title = title;
             post.imageUrl = imageUrl;
@@ -124,10 +88,26 @@ exports.updatePost = (req, res, next) => {
                     post: result
                 })
         })
-        .catch(catchErrorHandler)
+        .catch((err) => helpers.catchErrorHandler(err, next))
 };
 
-const clearImage = filePath => {
-    filePath = path.join(__dirname, '..', filePath);
-    fs.unlink(filePath, err => console.log(err));
+exports.deletePost = (req, res, next) => {
+    const postId = req.params.postId;
+    Post.findById(postId)
+        .then(post =>{
+            helpers.checkPostHandler(post);
+        //    checked logged in user
+            helpers.clearImage(post.imageUrl);
+            return Post.findByIdAndRemove(postId);
+
+        })
+        .then(result => {
+            console.log(result);
+            res.status(200)
+                .json({
+                    message: 'Post was deleted.'
+                })
+        })
+        .catch((err) => helpers.catchErrorHandler(err, next))
 };
+
