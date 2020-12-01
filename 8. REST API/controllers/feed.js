@@ -1,7 +1,6 @@
 const helpers = require('../utils/helpers');
 const Post = require('../models/post');
 
-
 exports.getPosts = (req, res, next) => {
     const currentPage = req.query.page || 1;
     const perPage = 2;

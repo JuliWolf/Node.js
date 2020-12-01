@@ -35,6 +35,7 @@ exports.checkErrorsHandler = (req) => {
     if(!errors.isEmpty()){
         const error = new Error('Validation failed, entered data is incorrect.');
         error.statusCode = 422;
+        error.data = error.array();
         throw error;
     }
 };
