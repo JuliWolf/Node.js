@@ -8,7 +8,6 @@ exports.clearImage = filePath => {
 };
 
 exports.catchErrorHandler = (err, next) => {
-    condole.log(err);
     if(!err.statusCode){
         err.statusCode = 500;
     }

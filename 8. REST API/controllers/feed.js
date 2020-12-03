@@ -85,15 +85,16 @@ exports.updatePost = (req, res, next) => {
         imageUrl = req.file.path;
     }
 
-    if(!imageUrl){
-        const error = new Error('No file picked.');
-        error.statusCode = 404;
-        throw error;
-    }
+    helpers.checkElemHandler(imageUrl, 'No file picked.', 404);
 
     Post.findById(postId)
         .then(post => {
             helpers.checkElemHandler(post, 'Could not find post');
+
+            if(post.creator.toString() !== req.userId){
+                helpers.checkElemHandler(false, 'Not authorized!', 403);
+            }
+
             if(imageUrl !== post.imageUrl){
                 helpers.clearImage(post.imageUrl);
             }
@@ -118,7 +119,11 @@ exports.deletePost = (req, res, next) => {
     Post.findById(postId)
         .then(post =>{
             helpers.checkElemHandler(post, 'Could not find post');
-        //    checked logged in user
+
+            if(post.creator.toString() !== req.userId){
+                helpers.checkElemHandler(false, 'Not authorized!', 403);
+            }
+
             helpers.clearImage(post.imageUrl);
             return Post.findByIdAndRemove(postId);
 
