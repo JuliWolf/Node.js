@@ -14,10 +14,10 @@ exports.catchErrorHandler = (err, next) => {
     next(err);
 };
 
-exports.checkPostHandler = (post) => {
-    if(!post){
-        const error = new Error('Could not find post');
-        error.statusCode = 404;
+exports.checkElemHandler = (item, message, statusCode) => {
+    if(!item){
+        const error = new Error(message);
+        error.statusCode = statusCode || 404;
         throw error;
     }
 };
@@ -35,7 +35,7 @@ exports.checkErrorsHandler = (req) => {
     if(!errors.isEmpty()){
         const error = new Error('Validation failed, entered data is incorrect.');
         error.statusCode = 422;
-        error.data = error.array();
+        error.data = errors.array();
         throw error;
     }
 };

@@ -52,7 +52,7 @@ exports.getPost = (req, res, next) => {
     const postId = req.params.postId;
     Post.findById(postId)
         .then(post => {
-            helpers.checkPostHandler(post);
+            helpers.checkElemHandler(post, 'Could not find post');
             res.status(200)
                 .json({
                     message: 'Post fetched.',
@@ -81,7 +81,7 @@ exports.updatePost = (req, res, next) => {
 
     Post.findById(postId)
         .then(post => {
-            helpers.checkPostHandler(post);
+            helpers.checkElemHandler(post, 'Could not find post');
             if(imageUrl !== post.imageUrl){
                 helpers.clearImage(post.imageUrl);
             }
@@ -105,7 +105,7 @@ exports.deletePost = (req, res, next) => {
     const postId = req.params.postId;
     Post.findById(postId)
         .then(post =>{
-            helpers.checkPostHandler(post);
+            helpers.checkElemHandler(post, 'Could not find post');
         //    checked logged in user
             helpers.clearImage(post.imageUrl);
             return Post.findByIdAndRemove(postId);
