@@ -54,3 +54,32 @@ exports.login = (req, res, next) => {
         })
         .catch((err) => helpers.catchErrorHandler(err, next));
 };
+
+exports.getUserStatus = (req, res, next) => {
+    User.findById(req.userId)
+        .then(user => {
+            helpers.checkElemHandler(user, 'User not found');
+            res.status(200)
+                .json({
+                    status: user.status
+                })
+        })
+        .catch((err) => helpers.catchErrorHandler(err, next));
+};
+
+exports.updateUserStatus = (req, res, next) => {
+    const newStatus = req.body.status;
+    User.findById(req.userId)
+        .then(user => {
+            helpers.checkElemHandler(user, 'User not found');
+            user.status = newStatus;
+            return user.save();
+        })
+        .then(result => {
+            res.status(200)
+                .json({
+                    message: 'User updated.'
+                })
+        })
+        .catch((err) => helpers.catchErrorHandler(err, next));
+};
