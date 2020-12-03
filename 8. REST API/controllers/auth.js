@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const helpers = require('../utils/helpers');
 const User = require('../models/user');
@@ -41,7 +42,15 @@ exports.login = (req, res, next) => {
         })
         .then(isEqual => {
             helpers.checkElemHandler(isEqual, 'Wrong password!', 401);
-
+            const token = jwt.sign({
+                email: loadedUser.email,
+                userId: loadedUser._id.toString()
+            }, 'secret', {expiresIn: '1h'});
+            res.status(200)
+                .json({
+                    token,
+                    userId: loadedUser._id.toString()
+                })
         })
         .catch((err) => helpers.catchErrorHandler(err, next));
 };
