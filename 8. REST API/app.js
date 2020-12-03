@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const cors = require('cors')
 
 const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
@@ -40,9 +41,11 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
+// app.use(cors());
 
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes);
+
 
 app.use((error, req, res, next) => {
     console.log(error);
@@ -57,7 +60,12 @@ app.use((error, req, res, next) => {
 
 mongoose.connect(MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true })
     .then(result => {
-        app.listen(8080);
+        const server = app.listen(8080);
+        const io = require('./socket').init(server);
+        io.on('connection', socket => {
+            socket.send("client connected")
+            console.log("client connected");
+        });
     })
     .catch(err => console.log(err));
 
