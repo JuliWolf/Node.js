@@ -45,25 +45,40 @@ class Feed extends Component {
     });
     socket.on('posts', data => {
       if(data.action === 'create'){
+        console.log(data);
         this.addPost(data.post);
       }
     });
   }
 
   addPost = post => {
-    console.log(post);
     this.setState(prevState => {
       const updatedPosts = [...prevState.posts];
       if (prevState.postPage === 1) {
-        updatedPosts.pop();
+        if (prevState.posts.length >= 2) {
+          updatedPosts.pop();
+        }
         updatedPosts.unshift(post);
       }
       return {
-        post: updatedPosts,
+        posts: updatedPosts,
         totalPosts: prevState.totalPosts + 1
-      }
+      };
     });
-  }
+  };
+
+  updatePost = post => {
+    this.setState(prevState => {
+      const updatedPosts = [...prevState.posts];
+      const updatedPostIndex = updatedPosts.findIndex(p => p._id === post._id);
+      if (updatedPostIndex > -1) {
+        updatedPosts[updatedPostIndex] = post;
+      }
+      return {
+        posts: updatedPosts
+      };
+    });
+  };
 
   loadPosts = direction => {
     if (direction) {
@@ -193,8 +208,6 @@ class Feed extends Component {
               p => p._id === prevState.editPost._id
             );
             updatedPosts[postIndex] = post;
-          } else if(updatedPosts.length < 2) {
-            updatedPosts = prevState.posts.concat(post);
           }
           return {
             posts: updatedPosts,
