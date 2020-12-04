@@ -5,4 +5,4 @@ module.exports = {
             views: 1234
         };
     }
-}
+};
