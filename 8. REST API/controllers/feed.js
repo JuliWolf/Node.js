@@ -86,10 +86,10 @@ exports.updatePost = async (req, res, next) => {
 
     helpers.checkElemHandler(imageUrl, 'No file picked.', 404);
     try{
-       const post =  await Post.findById(postId);
+       const post =  await Post.findById(postId).populate('creator');
         helpers.checkElemHandler(post, 'Could not find post');
 
-        if(post.creator.toString() !== req.userId){
+        if(post.creator._id.toString() !== req.userId){
             helpers.checkElemHandler(false, 'Not authorized!', 403);
         }
 
@@ -100,6 +100,7 @@ exports.updatePost = async (req, res, next) => {
         post.imageUrl = imageUrl;
         post.content = content;
         const updatedPost = await post.save();
+        io.getIO().emit('posts', { action: 'update', post: updatedPost });
         res.status(200)
             .json({
                 message: 'Post updated!',
