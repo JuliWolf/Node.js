@@ -4,10 +4,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
-const cors = require('cors')
-
-const feedRoutes = require('./routes/feed');
-const authRoutes = require('./routes/auth');
 const MONGODB_URI = 'mongodb+srv://Julia:92eqMJIDuktTc3tx@cluster0.atmea.mongodb.net/messages?retryWrites=true&w=majority';
 
 const app = express();
@@ -41,11 +37,6 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
-// app.use(cors());
-
-app.use('/feed', feedRoutes);
-app.use('/auth', authRoutes);
-
 
 app.use((error, req, res, next) => {
     console.log(error);
@@ -60,11 +51,7 @@ app.use((error, req, res, next) => {
 
 mongoose.connect(MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true })
     .then(result => {
-        const server = app.listen(8080);
-        const io = require('./socket').init(server);
-        io.on('connection', socket => {
-            console.log("client connected");
-        });
+        app.listen(8080);
     })
     .catch(err => console.log(err));
 
