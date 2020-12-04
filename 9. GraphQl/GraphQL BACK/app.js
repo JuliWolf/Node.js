@@ -4,6 +4,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const {graphqlHTTP} = require('express-graphql');
+
+const graphqlSchema = require('./graphql/schema');
+const graphqlResolver = require('./graphql/resolvers');
+
 const MONGODB_URI = 'mongodb+srv://Julia:92eqMJIDuktTc3tx@cluster0.atmea.mongodb.net/messages?retryWrites=true&w=majority';
 
 const app = express();
@@ -25,6 +30,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
+
 // app.use(bodyParser.urlencoded()); // data from form
 app.use(bodyParser.json()); //application/json
 app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
@@ -37,6 +43,11 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
+
+app.use('/graphql', graphqlHTTP({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver
+}));
 
 app.use((error, req, res, next) => {
     console.log(error);
