@@ -3,6 +3,7 @@ const validator = require("validator");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
+const Post = require("../models/post");
 
 const helpers = require("../utils/helpers");
 
@@ -53,5 +54,42 @@ module.exports = {
       {expiresIn: "1h"}
     );
     return {token, userId: user._id.toString()};
+  },
+  createPost: async function ({postInput}, req) {
+    helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
+
+    const {title, content, imageUrl} = postInput;
+    const errors = [];
+    if (validator.isEmpty(title) || !validator.isLength(title, {min: 5})) {
+      errors.push({message: "Title is invalid"});
+    }
+    if (validator.isEmpty(content) || !validator.isLength(content, {min: 5})) {
+      errors.push({message: "Content is invalid"});
+    }
+    if (errors.length > 0) {
+      const error = new Error("Invalid input.");
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+
+    const user = await User.findById(req.userId);
+    helpers.checkElemHandler(user, "Invalid User", 401);
+
+    const post = new Post({
+      title,
+      content,
+      imageUrl,
+      creator: user,
+    });
+    const createdPost = await post.save();
+    user.posts.push(createdPost);
+    await user.save();
+    return {
+      ...createdPost._doc,
+      _id: createdPost._id.toString(),
+      createdAt: createdPost.createdAt.toISOString(),
+      updatedAt: createdPost.updatedAt.toISOString(),
+    };
   },
 };

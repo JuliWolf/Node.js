@@ -8,6 +8,7 @@ const {graphqlHTTP} = require("express-graphql");
 
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
+const auth = require("./middleware/auth");
 
 const MONGODB_URI =
   "mongodb+srv://Julia:92eqMJIDuktTc3tx@cluster0.atmea.mongodb.net/messages?retryWrites=true&w=majority";
@@ -53,6 +54,8 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+app.use(auth);
 
 app.use(
   "/graphql",
