@@ -6,6 +6,7 @@ const User = require("../models/user");
 const Post = require("../models/post");
 
 const helpers = require("../utils/helpers");
+const post = require("../models/post");
 
 module.exports = {
   createUser: async function ({userInput}, req) {
@@ -90,6 +91,33 @@ module.exports = {
       _id: createdPost._id.toString(),
       createdAt: createdPost.createdAt.toISOString(),
       updatedAt: createdPost.updatedAt.toISOString(),
+    };
+  },
+  getPost: async function ({postId}, req) {
+    const post = await Post.findById(postId);
+  },
+  getPosts: async function ({page}, req) {
+    helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
+
+    if (!page) {
+      page = 1;
+    }
+    const perPage = 2;
+    const totalPosts = await Post.find().countDocuments();
+    const posts = await Post.find()
+      .sort({createdAt: -1})
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .populate("creator");
+    return {
+      posts: posts.map((post) => {
+        return {
+          ...post._doc,
+          _id: post._id.toString(),
+          createdAt: post.createdAt.toISOString(),
+        };
+      }),
+      totalPosts: totalPosts,
     };
   },
 };
