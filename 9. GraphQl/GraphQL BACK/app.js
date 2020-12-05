@@ -9,6 +9,7 @@ const {graphqlHTTP} = require("express-graphql");
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
 const auth = require("./middleware/auth");
+const helpers = require("./utils/helpers");
 
 const MONGODB_URI =
   "mongodb+srv://Julia:92eqMJIDuktTc3tx@cluster0.atmea.mongodb.net/messages?retryWrites=true&w=majority";
@@ -56,6 +57,19 @@ app.use((req, res, next) => {
 });
 
 app.use(auth);
+
+app.put("/post-image", (req, res, next) => {
+  helpers.checkElemHandler(req.isAuth, 'Not authenticated');
+  if (!req.file) {
+    return res.status(200).json({message: "No file provided!"});
+  }
+  if (req.body.oldPath) {
+    helpers.clearImage(req.body.oldPath);
+  }
+  return res
+    .status(201)
+    .json({message: "File stored", filePath: req.file.path});
+});
 
 app.use(
   "/graphql",

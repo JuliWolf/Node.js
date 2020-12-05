@@ -94,7 +94,16 @@ module.exports = {
     };
   },
   getPost: async function ({postId}, req) {
-    const post = await Post.findById(postId);
+	 helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
+	 
+    const post = await Post.findById(postId).populate("creator");
+    helpers.checkElemHandler(post, "Post not found", 404);
+    return {
+        ...post._doc,
+        createdAt: post.createdAt.toISOString(),
+		  _id: post._id.toString(),
+		  updatedAt: post.updatedAt.toISOString()
+    };
   },
   getPosts: async function ({page}, req) {
     helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
