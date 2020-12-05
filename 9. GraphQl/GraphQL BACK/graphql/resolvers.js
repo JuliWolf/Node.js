@@ -94,15 +94,15 @@ module.exports = {
     };
   },
   getPost: async function ({postId}, req) {
-	 helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
-	 
+    helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
+
     const post = await Post.findById(postId).populate("creator");
     helpers.checkElemHandler(post, "Post not found", 404);
     return {
-        ...post._doc,
-        createdAt: post.createdAt.toISOString(),
-		  _id: post._id.toString(),
-		  updatedAt: post.updatedAt.toISOString()
+      ...post._doc,
+      createdAt: post.createdAt.toISOString(),
+      _id: post._id.toString(),
+      updatedAt: post.updatedAt.toISOString(),
     };
   },
   getPosts: async function ({page}, req) {
@@ -127,6 +127,44 @@ module.exports = {
         };
       }),
       totalPosts: totalPosts,
+    };
+  },
+  updatePost: async function ({postId, postInput}, req) {
+    helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
+
+    const post = await Post.findById(postId).populate("creator");
+    helpers.checkElemHandler(post, "Post not found", 404);
+
+    if (post.creator._id.toString() !== req.userId.toString()) {
+      helpers.checkElemHandler(false, "Not authorized!", 403);
+    }
+
+    const {title, content, imageUrl} = postInput;
+    console.log(title, content, imageUrl);
+    const errors = [];
+    if (validator.isEmpty(title) || !validator.isLength(title, {min: 5})) {
+      errors.push({message: "Title is invalid"});
+    }
+    if (validator.isEmpty(content) || !validator.isLength(content, {min: 5})) {
+      errors.push({message: "Content is invalid"});
+    }
+    if (errors.length > 0) {
+      const error = new Error("Invalid input.");
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+    post.title = title;
+    post.content = content;
+    if (imageUrl !== undefined) {
+      post.imageUrl = imageUrl;
+    }
+    const updatedPost = await post.save();
+    return {
+      ...updatedPost._doc,
+      _id: updatedPost._id.toString(),
+      createdAt: updatedPost.createdAt.toISOString(),
+      updatedAt: updatedPost.updatedAt.toISOString(),
     };
   },
 };

@@ -184,6 +184,24 @@ class Feed extends Component {
 				}
 			`,
         };
+        if (this.state.editPost) {
+          graphqlQuery = {
+            query: `
+					mutation{
+						updatePost(postId: "${this.state.editPost._id}", postInput:{title: "${postData.title}", content: "${postData.content}", imageUrl: "${imageUrl}"}){
+							_id
+							title
+							content
+							imageUrl
+							creator {
+								name
+							}
+							createdAt
+						}
+					}
+				`,
+          };
+        }
 
         return fetch("http://localhost:8080/graphql", {
           method: "POST",
@@ -204,16 +222,17 @@ class Feed extends Component {
           );
         }
         if (resData.errors) {
-          throw new Error("User login failed!");
+          throw new Error("Post Loading failed!");
         }
         console.log(resData);
+        let resDataField = this.state.editPost ? "updatePost" : "createPost";
         const post = {
-          _id: resData.data.createPost._id,
-          title: resData.data.createPost.title,
-          content: resData.data.createPost.content,
-          creator: resData.data.createPost.creator.name,
-          createdAt: resData.data.createPost.createdAt,
-          imagePath: resData.data.createPost.imageUrl,
+          _id: resData.data[resDataField]._id,
+          title: resData.data[resDataField].title,
+          content: resData.data[resDataField].content,
+          creator: resData.data[resDataField].creator.name,
+          createdAt: resData.data[resDataField].createdAt,
+          imagePath: resData.data[resDataField].imageUrl,
         };
         this.setState((prevState) => {
           let updatedPosts = [...prevState.posts];
