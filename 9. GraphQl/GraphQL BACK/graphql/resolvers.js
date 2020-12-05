@@ -140,7 +140,7 @@ module.exports = {
     }
 
     const {title, content, imageUrl} = postInput;
-    console.log(title, content, imageUrl);
+
     const errors = [];
     if (validator.isEmpty(title) || !validator.isLength(title, {min: 5})) {
       errors.push({message: "Title is invalid"});
@@ -166,5 +166,23 @@ module.exports = {
       createdAt: updatedPost.createdAt.toISOString(),
       updatedAt: updatedPost.updatedAt.toISOString(),
     };
+  },
+  deletePost: async function ({postId}, req) {
+    helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
+
+    const post = await Post.findById(postId);
+    helpers.checkElemHandler(post, "Post not found", 404);
+
+    if (post.creator.toString() !== req.userId.toString()) {
+      helpers.checkElemHandler(false, "Not authorized!", 403);
+    }
+    helpers.clearImage(post.imageUrl);
+    await Post.findByIdAndRemove(postId);
+
+    const user = await User.findById(req.userId);
+    helpers.checkElemHandler(user, "User not found", 404);
+    user.posts.pull(postId);
+    await user.save();
+    return true;
   },
 };
