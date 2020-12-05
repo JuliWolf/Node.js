@@ -2,10 +2,13 @@
   "name": "nodejs-complete-guide",
   "version": "1.0.0",
   "description": "Complete Node.js Guide",
+  "entry": {
+	  "node": "10.19.0" 
+  },
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
+    "start": "MONGO_USER=Julia MONGO_PASSWORD=92eqMJIDuktTc3tx MONGO_DEFAULT_DATABASE=shop STRIPE_KEY=sk_test_51HsZPVGnxSZeTqeiJeUnd6yq81pB38FDbyveCsOmAn6kDmLx8rE73USec7FP1ZJfnLdn2dFj0sQRtSyUl0sXlVwJ00hddlLVMp node app.js",
     "start-server": "node app.js",
     "start:dev": "nodemon app.js"
   },

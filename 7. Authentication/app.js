@@ -17,7 +17,7 @@ const morgan = require("morgan");
 const errorController = require("./controllers/error");
 const User = require("./models/user");
 
-const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}.atmea.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true&w=majority`;
+const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.atmea.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true&w=majority`;
 
 const app = express();
 const store = new MongoDBStore({
@@ -27,8 +27,8 @@ const store = new MongoDBStore({
 
 const csrfProtection = csrf();
 
-const privateKey = fs.readFileSync("server.key");
-const certificate = fs.readFileSync("server.cert");
+// const privateKey = fs.readFileSync("server.key");
+// const certificate = fs.readFileSync("server.cert");
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -125,10 +125,11 @@ app.use((error, req, res, next) => {
 mongoose
   .connect(MONGODB_URI, {useUnifiedTopology: true, useNewUrlParser: true})
   .then((result) => {
-    https.createServer({
-		 key: privateKey,
-		 cert: certificate
-	 }, app).listen(process.env.PORT || 3000);
+    //  https.createServer({
+    // 	 key: privateKey,
+    // 	 cert: certificate
+    //  }, app).listen(process.env.PORT || 3000);
+    app.listen(process.env.PORT || 3000);
   })
   .catch((err) => {
     console.log(err);
