@@ -1,0 +1,9 @@
+{
+	"env": {
+		"PORT": 3000,
+		"MONGO_USER": "Julia",
+		"MONGO_PASSWORD": "92eqMJIDuktTc3tx@cluster0",
+		"MONGO_DEFAULT_DATABASE": "shop",
+		"STRIPE_KEY": "sk_test_51HsZPVGnxSZeTqeiJeUnd6yq81pB38FDbyveCsOmAn6kDmLx8rE73USec7FP1ZJfnLdn2dFj0sQRtSyUl0sXlVwJ00hddlLVMp"
+	}
+}
