@@ -185,4 +185,40 @@ module.exports = {
     await user.save();
     return true;
   },
+  getUser: async function (args, req) {
+    helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
+
+    const user = await User.findById(req.userId);
+    helpers.checkElemHandler(user, "User not found", 404);
+
+    return {
+      ...user._doc,
+      _id: user._id.toString(),
+    };
+  },
+  updateStatus: async function ({status}, req) {
+    helpers.checkElemHandler(req.isAuth, "Not authenticated!", 401);
+
+    const user = await User.findById(req.userId);
+    helpers.checkElemHandler(user, "User not found", 404);
+
+    const errors = [];
+    if (validator.isEmpty(status)) {
+      errors.push({message: "Status is invalid"});
+    }
+
+    if (errors.length > 0) {
+      const error = new Error("Invalid input.");
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+
+    user.status = status;
+    const updatedUser = await user.save();
+    return {
+      ...updatedUser._doc,
+      _id: updatedUser._id.toString(),
+    };
+  },
 };
