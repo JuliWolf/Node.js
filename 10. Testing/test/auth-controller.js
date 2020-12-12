@@ -9,7 +9,8 @@ describe("Auth Controller", function () {
   before(function (done) {
     mongoose
       .connect(
-        "mongodb+srv://Julia:92eqMJIDuktTc3tx@cluster0.atmea.mongodb.net/test-messages?retryWrites=true&w=majority"
+        "mongodb+srv://Julia:92eqMJIDuktTc3tx@cluster0.atmea.mongodb.net/test-messages?retryWrites=true&w=majority",
+        {useUnifiedTopology: true, useNewUrlParser: true}
       )
       .then((result) => {
         const user = new User({
@@ -26,7 +27,7 @@ describe("Auth Controller", function () {
       });
   });
 
-  it("should throw an errr code 500 if accessing the database fails", function (done) {
+  it("should throw an error code 500 if accessing the database fails", function (done) {
     sinon.stub(User, "findOne");
     User.findOne.throws();
 

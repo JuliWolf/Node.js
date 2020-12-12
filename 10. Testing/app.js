@@ -59,7 +59,8 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    "mongodb+srv://Julia:92eqMJIDuktTc3tx@cluster0.atmea.mongodb.net/messages?retryWrites=true&w=majority"
+    "mongodb+srv://Julia:92eqMJIDuktTc3tx@cluster0.atmea.mongodb.net/messages?retryWrites=true&w=majority",
+    {useUnifiedTopology: true, useNewUrlParser: true}
   )
   .then((result) => {
     app.listen(8080);
